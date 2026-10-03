@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BuddyVerse — বন্ধুত্ব হোক, খেলতে খেলতে!</title>
+<meta name="description" content="BuddyVerse social gaming platform prototype">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#061b45;--panel:#0a2555;--panel2:#102f68;--blue:#159cff;
+  --cyan:#35c9ff;--purple:#8b45ff;--text:#f7fbff;--muted:#a9bddb;
+  --line:rgba(255,255,255,.10);--green:#2bd67b;--gold:#ffbe2e;
+}
+body{
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:radial-gradient(circle at 50% 0%,#193f83 0,#071b45 42%,#020c24 100%);
+  color:var(--text);min-height:100vh;overflow-x:hidden
+}
+button,input{font:inherit}
+button{border:0;cursor:pointer}
+.app{max-width:480px;min-height:100vh;margin:auto;background:linear-gradient(180deg,#071e4b,#041534);position:relative;box-shadow:0 0 70px rgba(0,0,0,.35)}
+.topbar{height:68px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;background:rgba(5,23,57,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;font-size:21px;font-weight:800}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#19cfff,#954cff);display:grid;place-items:center;box-shadow:0 0 18px rgba(35,167,255,.4);font-size:20px}
+.brand span{background:linear-gradient(90deg,#fff,#22a9ff);-webkit-background-clip:text;color:transparent}
+.actions{display:flex;gap:8px}
+.iconbtn{width:38px;height:38px;border-radius:50%;background:#102f68;color:white;font-size:18px;position:relative}
+.badge{position:absolute;right:-1px;top:-2px;background:#ff365d;width:16px;height:16px;border-radius:50%;font-size:10px;display:grid;place-items:center}
+.screen{display:none;padding:12px 14px 92px;min-height:calc(100vh - 68px)}
+.screen.active{display:block}
+.stories{display:flex;gap:12px;overflow:auto;padding:3px 0 13px;scrollbar-width:none}
+.stories::-webkit-scrollbar{display:none}
+.story{min-width:58px;text-align:center;font-size:11px;color:var(--muted)}
+.storypic{width:54px;height:54px;border-radius:50%;padding:2px;background:linear-gradient(135deg,#15cfff,#9a42ff);margin:auto auto 5px}
+.storypic img,.avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.addstory{display:grid;place-items:center;background:#0e326e;font-size:27px}
+.card{background:linear-gradient(145deg,rgba(15,48,101,.96),rgba(7,29,68,.96));border:1px solid var(--line);border-radius:20px;margin:10px 0;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.create{display:flex;gap:10px;align-items:center}
+.avatar{width:42px;height:42px;border-radius:50%;overflow:hidden;flex:none;background:#244b83}
+.fakeinput{flex:1;background:#061b45;border:1px solid var(--line);border-radius:25px;padding:11px 14px;color:#92a8c7}
+.posthead{display:flex;align-items:center;gap:10px}.postmeta{flex:1}.postmeta b{display:block}.postmeta small{color:var(--muted)}
+.postimg{width:100%;height:230px;object-fit:cover;border-radius:15px;margin-top:12px;background:linear-gradient(135deg,#164b91,#f4a261)}
+.posttext{margin-top:10px;line-height:1.55;color:#eaf3ff}
+.postactions{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+.action{background:transparent;color:#c8d9ef;display:flex;gap:6px;align-items:center}
+.action.liked{color:#ff5477}
+.sectiontitle{font-size:22px;margin:7px 0 14px}
+.search{display:flex;align-items:center;gap:9px;background:#102f68;border:1px solid var(--line);padding:11px 14px;border-radius:18px;margin-bottom:12px}
+.search input{border:0;outline:0;background:transparent;color:white;width:100%}
+.chips{display:flex;gap:8px;overflow:auto;margin-bottom:12px}.chip{padding:7px 12px;border-radius:18px;background:#102f68;color:#cfe1f8;white-space:nowrap;font-size:12px}.chip.active{background:#149dff;color:white}
+.friend{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid var(--line)}
+.friend:last-child{border-bottom:0}.friendinfo{flex:1}.friendinfo b{display:block}.friendinfo small{color:var(--muted)}
+.online{display:inline-block;width:8px;height:8px;background:#27d978;border-radius:50%;margin-right:5px}
+.primary{background:linear-gradient(90deg,#0f9fff,#147eff);color:white;border-radius:20px;padding:9px 15px;font-weight:700}
+.secondary{background:#17386f;color:#dcecff;border-radius:20px;padding:9px 14px}
+.games{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.game{border-radius:18px;padding:18px 12px;min-height:145px;background:linear-gradient(145deg,#123e82,#0a2556);border:1px solid var(--line);text-align:center}
+.game .emoji{font-size:42px;margin-bottom:7px}.game b{display:block}.game small{color:var(--muted)}
+.challenge{background:linear-gradient(145deg,#122f69,#081c46);border:1px solid var(--line);border-radius:20px;padding:17px}
+.progress{height:9px;background:#0a1737;border-radius:10px;overflow:hidden;margin:12px 0}.progress i{display:block;width:60%;height:100%;background:linear-gradient(90deg,#0da9ff,#874aff);border-radius:10px}
+.profileHero{background:linear-gradient(180deg,#153b7b,#092354);border-radius:22px;padding:20px;text-align:center;overflow:hidden}
+.profilepic{width:105px;height:105px;border-radius:50%;margin:0 auto 10px;padding:3px;background:linear-gradient(135deg,#20caff,#9146ff)}
+.profilepic div{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#264f91,#081b44);font-size:42px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:18px}.stats b{display:block;font-size:17px}.stats small{color:var(--muted);font-size:10px}
+.level{display:flex;justify-content:space-between;font-size:12px;color:#b9cce6;margin-top:16px}
+.badges{display:flex;justify-content:center;gap:12px;margin:14px 0}.badgebig{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(145deg,#ffbf32,#9e5b00);font-size:25px}
+.tabs{display:flex;gap:8px;margin-top:13px}.tab{flex:1;background:#0e2c62;color:#a9c0de;padding:9px;border-radius:12px}.tab.active{background:#159cff;color:white}
+.coins{font-size:42px;font-weight:900;margin:5px 0}.coin{color:#ffc02e}.shoprow{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}.shoprow:last-child{border:0}.shopicon{width:42px;height:42px;border-radius:13px;background:#17386f;display:grid;place-items:center;font-size:21px}.shopinfo{flex:1}.shopinfo small{color:var(--muted)}
+.chat{display:flex;flex-direction:column;gap:10px;min-height:calc(100vh - 170px)}.bubble{max-width:78%;padding:10px 13px;border-radius:17px;background:#12376f;align-self:flex-start}.bubble.me{background:linear-gradient(135deg,#079fff,#176eff);align-self:flex-end}.composer{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);max-width:480px;width:100%;padding:9px 14px;background:rgba(4,18,43,.96);display:flex;gap:8px;z-index:15}.composer input{flex:1;background:#0f2e63;border:1px solid var(--line);border-radius:25px;padding:11px;color:white;outline:none}
+.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:72px;background:rgba(4,19,45,.97);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;z-index:30;backdrop-filter:blur(14px)}
+.navitem{background:transparent;color:#8da6c9;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:4px}.navitem span{font-size:20px}.navitem.active{color:#22a9ff}.plus{width:49px;height:49px;border-radius:50%;background:linear-gradient(135deg,#14b6ff,#1679ff);color:white;font-size:27px;box-shadow:0 7px 20px rgba(20,137,255,.35)}
+.toast{position:fixed;top:78px;left:50%;transform:translate(-50%,-20px);opacity:0;pointer-events:none;background:#14366d;padding:11px 17px;border-radius:25px;border:1px solid var(--line);z-index:60;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:flex-end;z-index:50}.modal.show{display:flex}.sheet{width:100%;max-width:480px;margin:auto;background:#092250;border-radius:25px 25px 0 0;padding:20px;border-top:1px solid var(--line)}.sheet textarea{width:100%;height:130px;background:#061b45;border:1px solid var(--line);border-radius:16px;padding:13px;color:white;resize:none;outline:none}.sheethead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+@media(min-width:700px){.app{border-left:1px solid var(--line);border-right:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo">🎮</div><span>BuddyVerse</span></div>
+    <div class="actions"><button class="iconbtn" onclick="toast('Search coming soon')">⌕</button><button class="iconbtn" onclick="showScreen('notifications')">🔔<i class="badge">3</i></button></div>
+  </header>
+
+  <main>
+    <section id="home" class="screen active">
+      <div class="stories">
+        <div class="story"><div class="storypic addstory">+</div>Add Story</div>
+        <div class="story"><div class="storypic">🌸</div>Riya</div>
+        <div class="story"><div class="storypic">😎</div>Sakib</div>
+        <div class="story"><div class="storypic">💜</div>Tania</div>
+        <div class="story"><div class="storypic">🧢</div>Arif</div>
+      </div>
+      <div class="card create"><div class="avatar">👨🏻</div><button class="fakeinput" onclick="openPost()">What's on your mind?</button></div>
+      <article class="card">
+        <div class="posthead"><div class="avatar">👨🏻</div><div class="postmeta"><b>Rafi Ahmed</b><small>2h ago · 🌍</small></div><b>•••</b></div>
+        <p class="posttext">আজকের বিকেলটা দারুণ! 😍 বন্ধুদের সাথে আড্ডা মানেই অন্যরকম আনন্দ! ❤️</p>
+        <div class="postimg" style="display:grid;place-items:center;font-size:70px">🌅</div>
+        <small style="color:#a9bddb;display:block;margin-top:8px">❤️👍 245 &nbsp;&nbsp; 32 comments</small>
+        <div class="postactions">
+          <button class="action" onclick="this.classList.toggle('liked')">❤️ Like</button>
+          <button class="action" onclick="toast('Comment box opened')">💬 Comment</button>
+          <button class="action" onclick="toast('Post shared!')">↗ Share</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="friends" class="screen">
+      <h2 class="sectiontitle">Friends</h2>
+      <div class="chips"><button class="chip active">All</button><button class="chip">🟢 Online</button><button class="chip">Requests <b>3</b></button></div>
+      <div class="search">🔍<input id="friendSearch" placeholder="Search friends..." oninput="filterFriends()"></div>
+      <div class="card" id="friendList">
+        <div class="friend" data-name="Riya Islam"><div class="avatar">👩🏻</div><div class="friendinfo"><b>Riya Islam</b><small><span class="online"></span>Online</small></div><button class="secondary" onclick="openChat('Riya Islam')">💬</button></div>
+        <div class="friend" data-name="Sakib Hasan"><div class="avatar">👨🏽</div><div class="friendinfo"><b>Sakib Hasan</b><small><span class="online"></span>Online</small></div><button class="secondary" onclick="openChat('Sakib Hasan')">💬</button></div>
+        <div class="friend" data-name="Tania Akter"><div class="avatar">👩🏽</div><div class="friendinfo"><b>Tania Akter</b><small><span class="online"></span>Online</small></div><button class="secondary" onclick="openChat('Tania Akter')">💬</button></div>
+        <div class="friend" data-name="Arif Khan"><div class="avatar">🧑🏻</div><div class="friendinfo"><b>Arif Khan</b><small>Last seen 10m ago</small></div><button class="secondary" onclick="openChat('Arif Khan')">💬</button></div>
+        <div class="friend" data-name="Nusrat Jahan"><div class="avatar">👩🏻</div><div class="friendinfo"><b>Nusrat Jahan</b><small>Last seen 1h ago</small></div><button class="secondary" onclick="openChat('Nusrat Jahan')">💬</button></div>
+      </div>
+      <button class="primary" style="width:100%;margin-top:8px" onclick="toast('Friend finder opened')">＋ Add Friend</button>
+    </section>
+
+    <section id="games" class="screen">
+      <h2 class="sectiontitle">🎮 Mini Games</h2>
+      <div class="card" style="background:linear-gradient(100deg,#0e67bd,#7437d8);"><b style="font-size:18px">🎮 Play with Friends</b><br><small>Have Fun Together!</small></div>
+      <div class="games">
+        <button class="game" onclick="startGame('Ludo')"><div class="emoji">🎲</div><b>Ludo</b><small>1 vs 1 / 2 vs 2</small></button>
+        <button class="game" onclick="startGame('Chess')"><div class="emoji">♟️</div><b>Chess</b><small>1 vs 1</small></button>
+        <button class="game" onclick="startGame('Tic-Tac-Toe')"><div class="emoji">❌⭕</div><b>Tic-Tac-Toe</b><small>1 vs 1</small></button>
+        <button class="game" onclick="startGame('Quiz Battle')"><div class="emoji">🧠</div><b>Quiz Battle</b><small>1 vs 1</small></button>
+        <button class="game" onclick="startGame('Word Battle')"><div class="emoji">🔤</div><b>Word Battle</b><small>1 vs 1</small></button>
+        <button class="game" onclick="toast('More games coming soon')"><div class="emoji">🎮</div><b>More Games</b><small>Coming Soon</small></button>
+      </div>
+    </section>
+
+    <section id="profile" class="screen">
+      <div class="profileHero">
+        <div class="profilepic"><div>👨🏻</div></div>
+        <h2>Tasin Rabby</h2><small style="color:#a9bddb">@tasinrabby</small>
+        <p style="margin-top:9px;font-size:12px">Dream Big | Play Hard | Make Friends ❤️</p>
+        <div class="level"><span>Lv. 5</span><span>320 / 500 XP</span></div><div class="progress"><i></i></div>
+        <div class="stats"><div><b>248</b><small>Followers</small></div><div><b>182</b><small>Friends</small></div><div><b>36</b><small>Posts</small></div><div><b>12</b><small>Games Won</small></div></div>
+      </div>
+      <div class="card"><h3>🏆 Badges</h3><div class="badges"><div class="badgebig">🏅</div><div class="badgebig">⭐</div><div class="badgebig">💎</div><div class="badgebig">👑</div></div></div>
+      <div class="tabs"><button class="tab active">Posts</button><button class="tab">Photos</button><button class="tab">Games</button></div>
+      <div class="card" style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:8px"><div style="height:90px;border-radius:10px;background:#214c88"></div><div style="height:90px;border-radius:10px;background:#4d347b"></div><div style="height:90px;border-radius:10px;background:#246c75"></div></div>
+    </section>
+
+    <section id="challenge" class="screen">
+      <h2 class="sectiontitle">🏆 Daily Challenge</h2>
+      <div class="challenge"><b>Complete the challenge & earn XP + Coins!</b><div style="display:flex;justify-content:space-between;margin-top:16px;color:#a9bddb"><span>1</span><span>2</span><b style="color:#22a9ff">3</b><span>4</span><span>5</span><span>6</span><span>7</span></div><hr style="border-color:var(--line);margin:12px 0"><h3>🎨 Drawing Challenge</h3><p style="color:#a9bddb;margin:7px 0">Draw your dream place within 1 hour.</p><b style="color:#22a9ff">+50 XP</b> &nbsp; <b style="color:#ffc02e">🪙 +20</b><button class="primary" style="display:block;width:100%;margin-top:15px" onclick="toast('Challenge joined!')">Join Now</button></div>
+      <div class="card"><h3>Leaderboard</h3><div class="friend"><div>🥇</div><div class="friendinfo"><b>Rafi</b></div><b>120 XP</b></div><div class="friend"><div>🥈</div><div class="friendinfo"><b>Tania</b></div><b>100 XP</b></div><div class="friend"><div>🥉</div><div class="friendinfo"><b>Shuvo</b></div><b>85 XP</b></div></div>
+    </section>
+
+    <section id="coins" class="screen">
+      <h2 class="sectiontitle">🪙 My Coins</h2>
+      <div class="card"><div class="coins"><span class="coin">🪙</span> 560</div><small style="color:#a9bddb">Current Balance</small><div style="display:flex;gap:8px;margin-top:15px"><button class="primary" style="flex:1" onclick="toast('+20 coins earned')">Earn Coins</button><button class="secondary" style="flex:1" onclick="toast('Purchase flow opened')">Buy Coins</button></div></div>
+      <div class="card"><h3>Use Coins For</h3><div class="shoprow"><div class="shopicon">✨</div><div class="shopinfo"><b>Profile Decoration</b><small>50–500 coins</small></div>›</div><div class="shoprow"><div class="shopicon">🎁</div><div class="shopinfo"><b>Virtual Gift</b><small>100–1000 coins</small></div>›</div><div class="shoprow"><div class="shopicon">🏆</div><div class="shopinfo"><b>Special Badges</b><small>200–1000 coins</small></div>›</div><div class="shoprow"><div class="shopicon">🎮</div><div class="shopinfo"><b>Game Items</b><small>50–500 coins</small></div>›</div></div>
+      <div class="card" style="border-color:#e2a900;background:linear-gradient(145deg,#2b2451,#102a61)"><h3>👑 Upgrade to Premium</h3><p style="color:#a9bddb;margin:6px 0">More coins, special badges and extra features.</p><button class="primary" onclick="toast('Premium page opened')">Explore Premium</button></div>
+    </section>
+
+    <section id="notifications" class="screen">
+      <h2 class="sectiontitle">Notifications</h2>
+      <div class="card">
+        <div class="friend"><div class="avatar">👩🏻</div><div class="friendinfo"><b>Riya Islam</b><small>sent you a friend request · 2m ago</small></div><button class="primary" onclick="toast('Friend request accepted')">✓</button></div>
+        <div class="friend"><div class="avatar">👨🏽</div><div class="friendinfo"><b>Sakib Hasan</b><small>liked your post · 15m ago</small></div>❤️</div>
+        <div class="friend"><div class="avatar">👩🏽</div><div class="friendinfo"><b>Tania Akter</b><small>commented on your post · 1h ago</small></div>💬</div>
+        <div class="friend"><div class="avatar">🧑🏻</div><div class="friendinfo"><b>Arif Khan</b><small>sent you a gift · 1h ago</small></div>🎁</div>
+        <div class="friend"><div class="avatar">🏆</div><div class="friendinfo"><b>New Daily Challenge!</b><small>Available now</small></div>🔥</div>
+      </div>
+    </section>
+
+    <section id="chat" class="screen">
+      <h2 class="sectiontitle">💬 <span id="chatName">Riya Islam</span></h2>
+      <div class="chat" id="chatBox"><div class="bubble">হেই! কেমন আছো? 😊</div><div class="bubble me">ভালো আছি 😊 তুমি কেমন আছো?</div><div class="bubble">আমিও ভালো! আজকে কোথায় খেলবে? 🎮</div></div>
+    </section>
+  </main>
+
+  <nav class="bottomnav">
+    <button class="navitem active" data-screen="home" onclick="showScreen('home')"><span>⌂</span>Home</button>
+    <button class="navitem" data-screen="friends" onclick="showScreen('friends')"><span>♟</span>Friends</button>
+    <button class="plus" onclick="openPost()">＋</button>
+    <button class="navitem" data-screen="games" onclick="showScreen('games')"><span>🎮</span>Games</button>
+    <button class="navitem" data-screen="profile" onclick="showScreen('profile')"><span>◉</span>Profile</button>
+  </nav>
+</div>
+
+<div class="composer" id="chatComposer" style="display:none"><input id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()"><button class="primary" onclick="sendMessage()">➤</button></div>
+<div class="toast" id="toast"></div>
+
+<div class="modal" id="postModal" onclick="if(event.target===this)closePost()">
+  <div class="sheet"><div class="sheethead"><h3>Create Post</h3><button class="iconbtn" onclick="closePost()">✕</button></div><textarea id="postText" placeholder="What's on your mind?"></textarea><div style="display:flex;gap:8px;margin-top:12px"><button class="secondary" onclick="toast('Photo picker opened')">📷 Photo</button><button class="secondary" onclick="toast('Video picker opened')">🎥 Video</button><button class="primary" style="margin-left:auto" onclick="publishPost()">Post</button></div></div>
+</div>
+
+<script>
+const screens=[...document.querySelectorAll('.screen')];
+function showScreen(id){
+  screens.forEach(s=>s.classList.toggle('active',s.id===id));
+  document.querySelectorAll('.navitem').forEach(n=>n.classList.toggle('active',n.dataset.screen===id));
+  document.getElementById('chatComposer').style.display=id==='chat'?'flex':'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),1800);
+}
+function openPost(){document.getElementById('postModal').classList.add('show')}
+function closePost(){document.getElementById('postModal').classList.remove('show')}
+function publishPost(){
+  const v=document.getElementById('postText').value.trim();
+  if(!v){toast('Write something first');return}
+  closePost();document.getElementById('postText').value='';showScreen('home');toast('Post published! 🎉');
+}
+function filterFriends(){
+  const q=document.getElementById('friendSearch').value.toLowerCase();
+  document.querySelectorAll('#friendList .friend').forEach(f=>f.style.display=f.dataset.name.toLowerCase().includes(q)?'flex':'none');
+}
+function openChat(name){
+  document.getElementById('chatName').textContent=name;showScreen('chat');
+}
+function sendMessage(){
+  const i=document.getElementById('chatInput'),v=i.value.trim();if(!v)return;
+  const b=document.createElement('div');b.className='bubble me';b.textContent=v;document.getElementById('chatBox').appendChild(b);i.value='';
+  setTimeout(()=>{const r=document.createElement('div');r.className='bubble';r.textContent='দারুণ! 😊';document.getElementById('chatBox').appendChild(r);},650);
+}
+function startGame(game){toast(game+' opened — friend challenge ready! 🎮')}
+</script>
+</body>
+</html>
